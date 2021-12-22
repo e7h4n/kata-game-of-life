@@ -1,3 +1,5 @@
+import { readFile } from 'fs/promises';
+
 export function neighbors(matrix: number[][], rows: number, cols: number) {
     const result = [];
     for (let i = 0; i < rows; i++) {
@@ -42,4 +44,34 @@ export function isAlive(alive: number, neighbors: number) {
     }
 
     return alive;
+}
+
+export async function main(argv: string[]) {
+    const filePath = argv[2];
+    const input = await readFile(filePath, 'utf-8');
+    const matrix = [];
+    let i = 0;
+    let j = 0;
+    let cols = 0;
+    for (let n = 0; n < input.length; n++) {
+        if (input[n] === '\n') {
+            i += 1;
+            j = 0;
+            continue;
+        }
+        matrix[i] = matrix[i] || [];
+        matrix[i][j] = input[n] === '*' ? 1 : 0;
+        j += 1;
+        cols = Math.max(j, cols);
+    }
+
+    nextGeneration(matrix, matrix.length, cols);
+    let result = '';
+    for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[i].length; j++) {
+            result += matrix[i][j] === 1 ? '*' : '.';
+        }
+        result += '\n';
+    }
+    console.log(result);
 }

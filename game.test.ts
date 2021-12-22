@@ -1,4 +1,5 @@
-import { neighbors, isAlive, nextGeneration } from './game';
+import { main, neighbors, isAlive, nextGeneration } from './game';
+import { readFile } from 'fs/promises';
 
 describe('neighbors', () => {
     [
@@ -137,5 +138,25 @@ describe('nextGeneration', () => {
             [0, 0, 0, 1, 1, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0],
         ]);
+    });
+});
+
+describe('main', () => {
+    const _log = console.log;
+    const logMock = jest.fn();
+    beforeEach(() => {
+        console.log = logMock;
+    });
+
+    afterEach(() => {
+        logMock.mockClear();
+        console.log = _log;
+    });
+
+    test('should take a file parameter than output next generation', async () => {
+        await main(['node', 'game.ts', 'fixtures/use_case1_input.txt']);
+
+        const output = await readFile('fixtures/use_case1_output.txt', 'utf-8');
+        expect(logMock.mock.calls).toHaveLength(1);
     });
 });
