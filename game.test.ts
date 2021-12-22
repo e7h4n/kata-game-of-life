@@ -177,12 +177,14 @@ describe('main', () => {
         console.log = _log;
     });
 
-    test('should take a file parameter than output next generation', async () => {
-        await main(['node', 'game.ts', 'fixtures/use_case1_input.txt']);
+    ['use_case1', 'use_case2', 'use_case3'].forEach(useCase => {
+        test('should take a file parameter than output next generation: ' + useCase, async () => {
+            await main(['node', 'game.ts', `fixtures/${useCase}_input.txt`]);
 
-        const output = await readFile('fixtures/use_case1_output.txt', 'utf-8');
-        expect(logMock.mock.calls).toHaveLength(1);
-        expect(logMock.mock.calls[0][0]).toBe(output.slice(0, output.length - 1));
+            const output = await readFile(`fixtures/${useCase}_output.txt`, 'utf-8');
+            expect(logMock.mock.calls).toHaveLength(1);
+            expect(logMock.mock.calls[0][0]).toBe(output.slice(0, output.length - 1));
+        });
     });
 });
 
