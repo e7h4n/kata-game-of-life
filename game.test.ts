@@ -1,4 +1,4 @@
-import { main, neighbors, isAlive, nextGeneration } from './game';
+import { main, neighbors, isAlive, nextGeneration, loadFile, printMatrix } from './game';
 import { readFile } from 'fs/promises';
 
 describe('neighbors', () => {
@@ -87,7 +87,7 @@ describe('neighbors', () => {
         ],
     ].forEach(([gameMatrix, neighborsMatrix]) => {
         test(`should generate neighbors count matrix : ${JSON.stringify(gameMatrix)}`, () => {
-            const matrix = neighbors(gameMatrix, gameMatrix.length, gameMatrix[0].length);
+            const matrix = neighbors(gameMatrix);
             expect(matrix).toMatchObject(neighborsMatrix);
         });
     });
@@ -131,13 +131,37 @@ describe('nextGeneration', () => {
             [0, 0, 0, 1, 1, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0],
         ];
-        nextGeneration(gameMatrix, 4, 8);
+        nextGeneration(gameMatrix);
         expect(gameMatrix).toMatchObject([
             [0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 1, 1, 0, 0, 0],
             [0, 0, 0, 1, 1, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0],
         ]);
+    });
+});
+
+describe('loadFile', () => {
+    [
+        [
+            'fixtures/matrix1.txt',
+            [
+                [1, 0],
+                [0, 1],
+            ]
+        ],
+        [
+            'fixtures/matrix2.txt',
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+            ]
+        ],
+    ].forEach(([filePath, expected]) => {
+        test('should load a matrix from file: ' + filePath, async () => {
+            const matrix = await loadFile(filePath);
+            expect(matrix).toMatchObject(expected);
+        });
     });
 });
 
@@ -158,5 +182,29 @@ describe('main', () => {
 
         const output = await readFile('fixtures/use_case1_output.txt', 'utf-8');
         expect(logMock.mock.calls).toHaveLength(1);
+        expect(logMock.mock.calls[0][0]).toBe(output);
+    });
+});
+
+describe('printMatrix', () => {
+    const _log = console.log;
+    const logMock = jest.fn();
+    beforeEach(() => {
+        console.log = logMock;
+    });
+
+    afterEach(() => {
+        logMock.mockClear();
+        console.log = _log;
+    });
+
+    test('should print a matrix to terminal by * and .', () => {
+        printMatrix([
+            [1, 0],
+            [0, 1],
+        ]);
+
+        expect(logMock.mock.calls).toHaveLength(1);
+        expect(logMock.mock.calls[0][0]).toBe('*.\n.*\n');
     });
 });

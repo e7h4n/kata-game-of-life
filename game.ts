@@ -1,17 +1,17 @@
 import { readFile } from 'fs/promises';
 
-export function neighbors(matrix: number[][], rows: number, cols: number) {
+export function neighbors(matrix: number[][]) {
     const result = [];
-    for (let i = 0; i < rows; i++) {
-        for(let j = 0; j < cols; j++) {
+    for (let i = 0; i < matrix.length; i++) {
+        for(let j = 0; j < matrix[i].length; j++) {
             result[i] = result[i] || [];
             result[i][j] = result[i][j] || 0;
             if (!matrix[i][j]) {
                 continue;
             }
 
-            for (let n = Math.max(i - 1, 0); n < Math.min(i + 2, rows); n++) {
-                for (let m = Math.max(j - 1, 0); m < Math.min(j + 2, cols); m++) {
+            for (let n = Math.max(i - 1, 0); n < Math.min(i + 2, matrix.length); n++) {
+                for (let m = Math.max(j - 1, 0); m < Math.min(j + 2, matrix[i].length); m++) {
                     if (n !== i || m !== j) {
                         result[n] = result[n] || [];
                         result[n][m] = (result[n][m] || 0) + 1;
@@ -24,11 +24,11 @@ export function neighbors(matrix: number[][], rows: number, cols: number) {
     return result;
 }
 
-export function nextGeneration(matrix: number[][], rows: number, cols: number) {
-    const neighborsMatrix = neighbors(matrix, rows, cols);
+export function nextGeneration(matrix: number[][]) {
+    const neighborsMatrix = neighbors(matrix);
 
-    for (let i = 0; i < rows; i++) {
-        for(let j = 0; j < cols; j++) {
+    for (let i = 0; i < matrix.length; i++) {
+        for(let j = 0; j < matrix[i].length; j++) {
             matrix[i][j] = isAlive(matrix[i][j], neighborsMatrix[i][j]);
         }
     }
@@ -46,8 +46,7 @@ export function isAlive(alive: number, neighbors: number) {
     return alive;
 }
 
-export async function main(argv: string[]) {
-    const filePath = argv[2];
+export async function loadFile(filePath: string) {
     const input = await readFile(filePath, 'utf-8');
     const matrix = [];
     let i = 0;
@@ -65,7 +64,16 @@ export async function main(argv: string[]) {
         cols = Math.max(j, cols);
     }
 
-    nextGeneration(matrix, matrix.length, cols);
+    for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < cols; j++) {
+            matrix[i][j] = matrix[i][j] || 0;
+        }
+    }
+
+    return matrix;
+}
+
+export function printMatrix(matrix: number[][]) {
     let result = '';
     for (let i = 0; i < matrix.length; i++) {
         for (let j = 0; j < matrix[i].length; j++) {
@@ -74,4 +82,12 @@ export async function main(argv: string[]) {
         result += '\n';
     }
     console.log(result);
+}
+
+export async function main(argv: string[]) {
+    const filePath = argv[2];
+    const matrix = await loadFile(filePath);
+
+    nextGeneration(matrix);
+    printMatrix(matrix);
 }
