@@ -182,7 +182,7 @@ describe('main', () => {
 
         const output = await readFile('fixtures/use_case1_output.txt', 'utf-8');
         expect(logMock.mock.calls).toHaveLength(1);
-        expect(logMock.mock.calls[0][0]).toBe(output);
+        expect(logMock.mock.calls[0][0]).toBe(output.slice(0, output.length - 1));
     });
 });
 
@@ -205,6 +205,6 @@ describe('printMatrix', () => {
         ]);
 
         expect(logMock.mock.calls).toHaveLength(1);
-        expect(logMock.mock.calls[0][0]).toBe('*.\n.*\n');
+        expect(logMock.mock.calls[0][0]).toBe('*.\n.*');
     });
 });

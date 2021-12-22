@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises';
 
-export function neighbors(matrix: number[][]) {
-    const result = [];
+export function neighbors(matrix: number[][]): number[][] {
+    const result: number[][] = [];
     for (let i = 0; i < matrix.length; i++) {
         for(let j = 0; j < matrix[i].length; j++) {
             result[i] = result[i] || [];
@@ -34,7 +34,7 @@ export function nextGeneration(matrix: number[][]) {
     }
 }
 
-export function isAlive(alive: number, neighbors: number) {
+export function isAlive(alive: number, neighbors: number): number {
     if (alive && (neighbors < 2 || neighbors > 3)) {
         return 0;
     }
@@ -46,9 +46,9 @@ export function isAlive(alive: number, neighbors: number) {
     return alive;
 }
 
-export async function loadFile(filePath: string) {
+export async function loadFile(filePath: string): Promise<number[][]> {
     const input = await readFile(filePath, 'utf-8');
-    const matrix = [];
+    const matrix: number[][] = [];
     let i = 0;
     let j = 0;
     let cols = 0;
@@ -79,7 +79,9 @@ export function printMatrix(matrix: number[][]) {
         for (let j = 0; j < matrix[i].length; j++) {
             result += matrix[i][j] === 1 ? '*' : '.';
         }
-        result += '\n';
+        if (i !== matrix.length - 1) {
+            result += '\n';
+        }
     }
     console.log(result);
 }
@@ -90,4 +92,8 @@ export async function main(argv: string[]) {
 
     nextGeneration(matrix);
     printMatrix(matrix);
+}
+
+if (typeof require !== 'undefined' && require.main === module) {
+    main(process.argv);
 }
